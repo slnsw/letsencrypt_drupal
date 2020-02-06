@@ -28,7 +28,7 @@ deploy_challenge() {
     #   TXT record. For HTTP validation it is the value that is expected
     #   be found in the $TOKEN_FILENAME file.
 
-    drush_set_challenge ${DRUSH_ALIAS} ${DRUPAL_VERSION} ${DOMAIN} ${TOKEN_VALUE}
+    drush_add_challenge ${DRUSH_ALIAS} ${DRUPAL_VERSION} ${DOMAIN} ${TOKEN_VALUE}
 }
 
 clean_challenge() {
@@ -132,7 +132,7 @@ startup_hook() {
   # This hook is called before the cron command to do some initial tasks
   # (e.g. starting a webserver).
 
-  :
+  drush_clear_challenge ${DRUSH_ALIAS} ${DRUPAL_VERSION} ${DOMAIN}
 }
 
 exit_hook() {

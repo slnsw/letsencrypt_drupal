@@ -73,3 +73,37 @@ drush_set_challenge()
     drush ${DRUSH_ALIAS} sset -y --uri=${DOMAIN} letsencrypt_challenge.challenge "${TOKEN_VALUE}"
   fi
 }
+
+#---------------------------------------------------------------------
+drush_add_challenge()
+{
+  DRUSH_ALIAS="${1}"
+  DRUPAL_VERSION="${2}"
+  DOMAIN="${3}"
+  TOKEN_VALUE="${4}"
+
+  if [[ "${DRUPAL_VERSION}" == "7" ]]; then
+    drush ${DRUSH_ALIAS} en -y --uri=${DOMAIN} letsencrypt_challenge
+    drush ${DRUSH_ALIAS} letsencrypt-challenge-add -y --uri=${DOMAIN} "${TOKEN_VALUE}"
+  elif [[ "${DRUPAL_VERSION}" == "8" ]]; then
+    drush ${DRUSH_ALIAS} en -y --uri=${DOMAIN} letsencrypt_challenge
+    drush ${DRUSH_ALIAS} sset -y --uri=${DOMAIN} letsencrypt_challenge.challenge "${TOKEN_VALUE}"
+  fi
+}
+
+#---------------------------------------------------------------------
+drush_clear_challenge()
+{
+  DRUSH_ALIAS="${1}"
+  DRUPAL_VERSION="${2}"
+  DOMAIN="${3}"
+  TOKEN_VALUE="${4}"
+
+  if [[ "${DRUPAL_VERSION}" == "7" ]]; then
+    drush ${DRUSH_ALIAS} en -y --uri=${DOMAIN} letsencrypt_challenge
+    drush ${DRUSH_ALIAS} letsencrypt-challenge-clear -y --uri=${DOMAIN}
+  elif [[ "${DRUPAL_VERSION}" == "8" ]]; then
+    drush ${DRUSH_ALIAS} en -y --uri=${DOMAIN} letsencrypt_challenge
+    drush ${DRUSH_ALIAS} sset -y --uri=${DOMAIN} letsencrypt_challenge.challenge ""
+  fi
+}
