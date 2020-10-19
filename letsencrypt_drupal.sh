@@ -91,22 +91,6 @@ main() {
       exit 1
     fi
 
-    # Workaround!
-    #
-    # @ToDo: Update to new version ASAP!
-    #
-    # New version requests all challenges for all domains at once.
-    #
-    # Our script builds on old approach where
-    # the whole challenge and verification process
-    # is proccesed site by site.
-    #
-    # Using this version from Dec 2017 works.
-    # But still includes this bug: https://github.com/dehydrated-io/dehydrated/issues/450
-    cd ${CURRENT_DIR}/dehydrated || exit
-    git checkout 2adc57791ca10ffa43c535a6f69fb77ebb0e351a
-    cd ${CURRENT_DIR} || exit
-
   else
     logline "${DEHYDRATED} is already in place - all good."
   fi
@@ -117,13 +101,13 @@ main() {
   mkdir -p ${CERT_DIR}
 
   # Generate config and create empty domains.txt
-  echo 'CA="https://acme-v01.api.letsencrypt.org/directory"' > ${FILE_BASECONFIG}
-  echo 'CA_TERMS="https://acme-v01.api.letsencrypt.org/terms"' >> ${FILE_BASECONFIG}
+  echo 'CA="letsencrypt"' > ${FILE_BASECONFIG}
   echo 'CHALLENGETYPE="http-01"' >> ${FILE_BASECONFIG}
   echo 'WELLKNOWN="'${TMP_DIR}/wellknown'"' >> ${FILE_BASECONFIG}
   echo 'BASEDIR="'${CERT_DIR}'"' >> ${FILE_BASECONFIG}
   echo 'HOOK="'${CURRENT_DIR}'/hooks/letsencrypt_drupal_hooks.sh"' >> ${FILE_BASECONFIG}
   echo 'DOMAINS_TXT="'${FILE_DOMAINSTXT}'"' >> ${FILE_BASECONFIG}
+  echo 'HOOK_CHAIN="no"' >> ${FILE_BASECONFIG}
   echo 'CONFIG_D="'${DIRECTORY_DEHYDRATED_CONFIG}'"' >> ${FILE_BASECONFIG}
 
 #  # Dehydrated does not pass arbitary parameters to hooks. Save some data aside.
@@ -131,7 +115,8 @@ main() {
 #  echo ${DRUPAL_VERSION} > ${FILE_DRUPAL_VERSION}
 #  echo ${PROJECT_ROOT} > ${FILE_PROJECT_ROOT}
 
-  DEHYDRATED_RESULT=$(${CURRENT_DIR}/dehydrated/dehydrated --config ${FILE_BASECONFIG} --cron --accept-terms ${DEHYDRATED_SWITCHES} 2>&1)
+  echo "EXECUTING: ${CURRENT_DIR}/dehydrated/dehydrated --config ${FILE_BASECONFIG} --cron --accept-terms --force ${DEHYDRATED_SWITCHES}"
+  DEHYDRATED_RESULT=$(${CURRENT_DIR}/dehydrated/dehydrated --config ${FILE_BASECONFIG} --cron --accept-terms --force ${DEHYDRATED_SWITCHES} 2>&1)
   if [ $? -eq 0 ]
   then
     # Send result to slack.
